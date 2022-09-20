@@ -49,3 +49,22 @@ Parametro | Descripción | Detalles
 `username` | Nombre de usuario | No puede repetirse
 `pass` | contraseña | Falta validacion
 
+### GET [/logout]
+
+Desconexion del usuario
+
+### GET [/name/:nconst]
+
+Consulta sobre una persona por medio de su ID
+
+Parametro | Descripción | Detalles
+--:|--|--
+`ncosnt` | ID de la persona | No puede repetirse
+
+### GET [/title/:tconst]
+
+Consulta sobre un titulo por medio de su ID
+
+Parametro | Descripción | Detalles
+--:|--|--
+`tcosnt` | ID del titulo | No puede repetirse
