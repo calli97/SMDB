@@ -63,8 +63,45 @@ Parametro | Descripción | Detalles
 
 ### GET [/title/:tconst]
 
-Consulta sobre un titulo por medio de su ID
+Consulta la informacion de un titulo por medio de su ID. En caso de que el usuario este logueado tambien muestra la opinion del usuario de este titulo si esta existe.
 
 Parametro | Descripción | Detalles
 --:|--|--
 `tcosnt` | ID del titulo | No puede repetirse
+
+### GET [/listtitles]
+
+Muestra los titulos del dataset ordenados por ID. Acepta filtrar por tipo de titulos. Tambien retorna las rutas a los siguientes titulos de la consulta en caso de que se exeda el limite establecido para asi navegar entre todos los resultados.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`type` | Tipo del titulo | -
+`limit` | Cantidad maxima a mostrar por la consulta  | No puede ser menor a 0 y por defecto se establece en 25
+`offset` | Cantidad de valores iniciales ignorados | No puede ser menor a 0 y por defecto se establece en 0
+
+### GET [/search]
+
+Mecanismo de busqueda simple. Permite buscar entre los titulos por el nombre de estos. Tambien retorna las rutas a los siguientes titulos de la consulta en caso de que se exeda el limite establecido para asi navegar entre todos los resultados.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`search` | Palabra a buscar dentro de los nombres de los titulos | -
+`limit` | Cantidad maxima a mostrar por la consulta  | No puede ser menor a 0 y por defecto se establece en 25
+`offset` | Cantidad de valores iniciales ignorados | No puede ser menor a 0 y por defecto se establece en 0
+
+### GET [/advancesearch]
+
+Mecanismo de busqueda completo. Permite buscar entre los titulos por el nombre de estos filtrando por año de estreno, rating minimo, generos, tipos y duracion minima. Tambien retorna las rutas a los siguientes titulos de la consulta en caso de que se exeda el limite establecido para asi navegar entre todos los resultados.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`search` | Palabra a buscar dentro de los nombres de los titulos | -
+`limit` | Cantidad maxima a mostrar por la consulta  | No puede ser menor a 0 y por defecto se establece en 25
+`offset` | Cantidad de valores iniciales ignorados | No puede ser menor a 0 y por defecto se establece en 0
+`startyear` | Año de estreno del titulo | Valor numerico
+`duration` | Duracion minima del titulo | Valor numerico
+`rating` | Rating minimo del titulo | Valor numerico
+
+
+
+
