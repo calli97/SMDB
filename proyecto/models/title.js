@@ -1,0 +1,26 @@
+class Title{
+    constructor(tconst,primaryTitle,originalTitle,type,duration,startYear,endYear,isAdult,genres){
+        this.tconst=tconst
+        this.primaryTitle=primaryTitle
+        this.originalTitle=originalTitle
+        this.type=type
+        this.duration=duration
+        this.startYear=startYear
+        this.endYear=endYear
+        this.isAdult=isAdult
+        this.genres=genres
+    }
+    addScore(score){
+        this.score=score
+    }
+    addCrew(crew){
+        this.crew=crew
+    }
+    addPrincipals(principals){
+        this.principals=principals
+    }
+    addUserOpinion(userOpinion){
+        this.userOpinion=userOpinion
+    }
+}
+module.exports=Title
