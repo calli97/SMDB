@@ -102,6 +102,28 @@ Parametro | Descripción | Detalles
 `duration` | Duracion minima del titulo | Valor numerico
 `rating` | Rating minimo del titulo | Valor numerico
 
+### POST [/title/:tconst/add]
 
+Solo esta habilitado si el usuario esta logueado. Permite al usuario agregar su opinion sobre el titulo identificado por el id.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`tconst` | ID del titulo | No puede repetirse
+
+### PUT [/title/:tconst/update]
+
+Solo esta habilitado si el usuario esta logueado. Permite al usuario modificar su opinion sobre el titulo identificado por el id.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`tconst` | ID del titulo | No puede repetirse
+
+### DELETE [/title/:tconst/delete]
+
+Solo esta habilitado si el usuario esta logueado. Permite al usuario eliminar su opinion sobre el titulo identificado por el id.
+
+Parametro | Descripción | Detalles
+--:|--|--
+`tconst` | ID del titulo | No puede repetirse
 
 
