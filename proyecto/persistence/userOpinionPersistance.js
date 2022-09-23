@@ -1,4 +1,4 @@
-const pool = require('../models/imdb-connection')
+const pool = require('./db/SMDBConnection')
 const UserOpinion=require('../models/userOpinion')
 
 let userOpinionPersistance={}
@@ -31,9 +31,7 @@ userOpinionPersistance.updateOpinion=async(tconst,userId,rating,favorite,state)=
     let oResults=await pool.query("SELECT 1 FROM users_ratings WHERE tconst=? AND id_user=?",[tconst,userId])
     if(oResults.length===1){
         //Actualizo la opinion
-        console.log(rating,favorite,state ,userId)
         let aResults=await pool.query("UPDATE users_ratings SET rating=?, favorite=?, state=? WHERE tconst=? AND id_user=?",[rating,favorite,state,tconst,userId])
-        console.log(aResults)
         //Retorno la opinion agregada
         return new UserOpinion(userId,tconst,rating,favorite,state)
     }else{

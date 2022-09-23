@@ -9,7 +9,7 @@ searchController.listTitles=async(req,res,next)=>{
     let limit=req.query.limit?Number(req.query.limit):25
     let offset=req.query.offset?Number(req.query.offset):0
     let type=req.query.type
-    let userId=req.user?req.user.id_user:null
+    let userId=req.session.loggedin?req.session.user.idUser:null
     let locals={}
     //Verifico que el tipo este incluido en la lista
     if(type!=undefined){
@@ -28,7 +28,6 @@ searchController.listTitles=async(req,res,next)=>{
     locals.type=type
     locals.navigation=getNavigation(limit,offset,locals.path,req.query)
     res.json(locals)
-    //res.render('listtitles',locals)
 }
 
 searchController.search=async(req,res,next)=>{

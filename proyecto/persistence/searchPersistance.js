@@ -1,4 +1,4 @@
-const pool=require('../models/imdb-connection')
+const pool=require('./db/SMDBConnection')
 const Title=require('../models/title')
 const titlePersistance=require('./titlePersistance')
 
@@ -27,7 +27,6 @@ searchPersistance.search=async(search,limit,offset,userId)=>{
         return null
     }
 }
-//Arreglo con tipos posibles de tipos y generos
 
 searchPersistance.advanceSearch=async(search,limit,offset,types,genres,startYear,rating,duration,userId)=>{
     search+='*'

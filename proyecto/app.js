@@ -6,7 +6,7 @@ const port= (process.env.PORT) || 3000
 const app=express()
 const session=require('express-session')
 const MySQLStore=require('express-mysql-session')
-const {dbconfig}=require('./models/db-conf')
+const {dbconfig}=require('./persistence/db/DBConfig')
 
 app.set('port',port)
 

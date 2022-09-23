@@ -1,4 +1,4 @@
-const pool=require('../models/imdb-connection')
+const pool=require('./db/SMDBConnection')
 const Name = require('../models/name')
 const Role = require('../models/role')
 
@@ -7,7 +7,12 @@ let namePersistance={}
 
 //Se obtiene el nombre de la base de datos a partir del id (nconst)
 namePersistance.getNameFullData=async(nconst)=>{
-    let nResult=await pool.query('SELECT * FROM name_basics WHERE nconst=?',[nconst])
+    let nResult
+    try {
+        nResult=await pool.query('SELECT * FROM name_basics WHERE nconst=?',[nconst])
+    } catch (error) {
+        throw new Error('Connecting to database failed',{cause:error})
+    }
     if(nResult.length===1){
         let primaryProfession=nResult[0].primary_profession?nResult[0].primary_profession.split(','):[]
         let known=nResult[0].known_for_titles?nResult[0].known_for_titles.split(','):[]

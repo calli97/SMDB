@@ -1,4 +1,4 @@
-const pool=require('../models/imdb-connection')
+const pool=require('./db/SMDBConnection')
 
 const Title=require('../models/title')
 const Score=require('../models/score')
@@ -74,7 +74,6 @@ titlePersistance.getPrincipals=async(tconst)=>{
     //No se encontro el reparto
     return null
 }
-
 
 titlePersistance.getCrew=async(tconst)=>{
     const cResults=await pool.query('SELECT * FROM title_crew WHERE tconst=?',[tconst])

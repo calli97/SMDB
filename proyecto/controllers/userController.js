@@ -21,7 +21,6 @@ userController.userVerification=async (req,res,next)=>{
         res.status(400).end()
     }
     let user=await userPersistance.userVerification(username,pass)
-    console.log(pass)
     if(user!=null){
         req.session.loggedin=true
         req.session.user=user

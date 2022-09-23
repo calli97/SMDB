@@ -1,8 +1,8 @@
 module.exports={
     "dbconfig":{
         "host":"localhost",
-        "user":"user",
+        "user":"root",
         "password":"pass",
-        "database":"database"
+        "database":"smdb"
     }
 }

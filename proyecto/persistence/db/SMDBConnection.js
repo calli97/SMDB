@@ -1,5 +1,5 @@
 const mysql = require('mysql')
-const {dbconfig}=require('./db-conf')
+const {dbconfig}=require('./DBConfig')
 
 const {promisify}=require('util')
 
@@ -16,10 +16,11 @@ pool.getConnection((err,connection)=>{
         if(err.code==='ECONNREFUSED'){
             console.error('DATABASE CONNECTION WAS REFUSED')
         }
+    }else{
+        if(connection)connection.release()
+        console.log('DB is connected')
+        return;
     }
-    if(connection)connection.release()
-    console.log('DB is connected')
-    return;
 })
 pool.query=promisify(pool.query)
 

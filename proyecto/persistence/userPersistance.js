@@ -1,5 +1,5 @@
 const User=require('../models/user')
-const pool=require('../models/imdb-connection')
+const pool=require('./db/SMDBConnection')
 const bcryptjs=require('bcryptjs')
 
 let userPersistance={}
@@ -25,7 +25,6 @@ userPersistance.addUser=async(fullname,username,pass,email)=>{
 userPersistance.userVerification=async(username,pass)=>{
     let uResults=await pool.query('SELECT * FROM users WHERE username=?',[username])
     if(uResults.length===1){
-        console.log(uResults)
         if(await bcryptjs.compare(pass,uResults[0].pass)){
             //let hashpass=await bcryptjs.hash(pass,10)
             //Retorno los datos del usuario
