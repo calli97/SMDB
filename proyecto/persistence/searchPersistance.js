@@ -6,20 +6,17 @@ let searchPersistance={}
 
 searchPersistance.search=async(search,limit,offset,userId)=>{
     search+='*'
-    let sql='SELECT * FROM title_basics LEFT JOIN title_ratings on title_ratings.tconst=title_basics.tconst WHERE MATCH(primary_title) AGAINST (? IN BOOLEAN MODE) AND title_type IN(\'movie\',\'tvseries\') ORDER BY title_ratings.average_rating DESC'
+    let sql='SELECT title_basics.tconst,title_basics.primary_title FROM title_basics LEFT JOIN title_ratings on title_ratings.tconst=title_basics.tconst WHERE MATCH(primary_title) AGAINST (? IN BOOLEAN MODE) AND title_type IN(\'movie\',\'tvseries\') ORDER BY title_ratings.average_rating DESC'
     sql+=' LIMIT '+limit
     sql+=' OFFSET '+offset
     const sResults=await pool.query({sql:sql,nestTables: true},[search])
     if(sResults.length>0){
         let results=[]
         for(let i=0;i<sResults.length;i++){
-            let title=new Title(sResults[i].title_basics.tconst,sResults[i].title_basics.primary_title,sResults[i].title_basics.original_title,
-                sResults[i].title_basics.title_type,sResults[i].title_basics.runtime_minutes,sResults[i].title_basics.start_year,
-                sResults[i].title_basics.end_year,sResults[i].title_basics.is_adult,
-                sResults[i].title_basics.genres?sResults[i].title_basics.genres.split(','):[])
-            title.addScore(await titlePersistance.getScores(title.tconst))
-            title.addUserOpinion(await titlePersistance.getUserOpinion(title.tconst,userId))
-            results.push(title)
+            let result={}
+            result.title=sResults[i].title_basics.primary_title
+            result.tconst=sResults[i].title_basics.tconst
+            results.push(result)
         }
         return results
     }else{ 
@@ -30,7 +27,7 @@ searchPersistance.search=async(search,limit,offset,userId)=>{
 
 searchPersistance.advanceSearch=async(search,limit,offset,types,genres,startYear,rating,duration,userId)=>{
     search+='*'
-    let sql='SELECT * FROM title_basics LEFT JOIN title_ratings ON title_basics.tconst=title_ratings.tconst WHERE MATCH(primary_title) AGAINST (? IN BOOLEAN MODE)'
+    let sql='SELECT title_basics.tconst,title_basics.primary_title FROM title_basics LEFT JOIN title_ratings ON title_basics.tconst=title_ratings.tconst WHERE MATCH(primary_title) AGAINST (? IN BOOLEAN MODE)'
     //Agrego los typos para filtrar
     if(types.length>0){
         sql+=' AND title_type IN ('
@@ -66,13 +63,10 @@ searchPersistance.advanceSearch=async(search,limit,offset,types,genres,startYear
     if(sResults.length>0){
         let results=[]
         for(let i=0;i<sResults.length;i++){
-            let title=new Title(sResults[i].title_basics.tconst,sResults[i].title_basics.primary_title,sResults[i].title_basics.original_title,
-                sResults[i].title_basics.title_type,sResults[i].title_basics.runtime_minutes,sResults[i].title_basics.start_year,
-                sResults[i].title_basics.end_year,sResults[i].title_basics.is_adult,
-                sResults[i].title_basics.genres?sResults[i].title_basics.genres.split(','):[])
-            title.addScore(await titlePersistance.getScores(title.tconst))
-            title.addUserOpinion(await titlePersistance.getUserOpinion(title.tconst,userId))
-            results.push(title)
+            let result={}
+            result.title=sResults[i].title_basics.primary_title
+            result.tconst=sResults[i].title_basics.tconst
+            results.push(result)
         }
         return results
     }else{ 
@@ -82,7 +76,7 @@ searchPersistance.advanceSearch=async(search,limit,offset,types,genres,startYear
 }
 
 searchPersistance.listTitles=async(limit,offset,type,userId=null)=>{
-    let sql='SELECT * FROM title_basics'
+    let sql='SELECT tconst,primary_title FROM title_basics'
     let queryParams=[]
     if(limit<=0,offset<0){
         //Invocacion invalida
@@ -100,12 +94,10 @@ searchPersistance.listTitles=async(limit,offset,type,userId=null)=>{
     let titles=[]
     if(tResults.length>=1){
         for(let i=0;i<tResults.length;i++){
-            let title=new Title(tResults[i].tconst,tResults[i].primary_title,tResults[i].original_title,tResults[i].title_type,
-                tResults[i].runtime_minutes,tResults[i].start_year,tResults[i].end_year,tResults[i].is_adult,
-                tResults[i].genres?tResults[i].genres.split(','):[])
-            title.addScore(await titlePersistance.getScores(title.tconst))
-            title.addUserOpinion(await titlePersistance.getUserOpinion(title.tconst,userId))
-            titles.push(title)
+            let result={}
+            result.title=tResults[i].primary_title
+            result.tconst=tResults[i].tconst
+            titles.push(result)
         }
         return titles
     }else{

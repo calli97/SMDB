@@ -1,12 +1,11 @@
 class Name{
-    constructor(nconst,primaryName,birthYear,deathYear,primaryProfession,knownForTitles,mainRoles){
+    constructor(nconst,primaryName,birthYear,deathYear,primaryProfession,knownForTitles){
         this.nconst=nconst
         this.primaryName=primaryName
         this.birthYear=birthYear
         this.deathYear=deathYear
         this.primaryProfession=primaryProfession
         this.knownForTitles=knownForTitles
-        this.mainRoles=mainRoles
     }
 }
 

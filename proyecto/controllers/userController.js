@@ -9,9 +9,12 @@ userController.register=async(req,res,next)=>{
     if(!req.body.username||!req.body.fullname||!req.body.email||!req.body.pass){
         res.status(400).end()
     }
-    let newUser=await userPersistance.addUser(fullname,username,pass,email)
-
-    res.json(newUser)
+    try {
+        let newUser=await userPersistance.addUser(fullname,username,pass,email)
+        res.json(newUser)
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
 }
 
 userController.userVerification=async (req,res,next)=>{

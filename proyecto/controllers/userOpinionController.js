@@ -7,13 +7,17 @@ userOpinionController.addOpinion=async(req,res,next)=>{
     let rating=Number(req.body.rating)
     let favorite=req.body.favorite?1:0
     let state=req.body.state
-
-    let userOpinion=await userOpinionPersistance.addOpinion(tconst,userId,rating,favorite,state)
-    if(userOpinion){
-        res.status(201).json(userOpinion)
-    }else{
-        res.status(500).end()
+    try {
+        let userOpinion=await userOpinionPersistance.addOpinion(tconst,userId,rating,favorite,state)
+        if(userOpinion){
+            res.status(201).json(userOpinion)
+        }else{
+            res.status(500).end()
+        }
+    } catch (error) {
+        res.status(500).json({error:error.message})
     }
+    
 }
 
 userOpinionController.updateOpinion=async(req,res,next)=>{
@@ -23,11 +27,16 @@ userOpinionController.updateOpinion=async(req,res,next)=>{
     let favorite=req.body.favorite?1:0
     let state=req.body.state
     
-    let userOpinion=await userOpinionPersistance.updateOpinion(tconst,userId,rating,favorite,state)
-    if(userOpinion){
-        res.status(201).json(userOpinion)
-    }else{
-        res.status(500).end()
+    
+    try {
+        let userOpinion=await userOpinionPersistance.updateOpinion(tconst,userId,rating,favorite,state)
+        if(userOpinion){
+            res.status(201).json(userOpinion)
+        }else{
+            res.status(500).end()
+        }
+    } catch (error) {
+        res.status(500).json({error:error.message})
     }
 }
 

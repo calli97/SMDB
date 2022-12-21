@@ -16,21 +16,10 @@ namePersistance.getNameFullData=async(nconst)=>{
     if(nResult.length===1){
         let primaryProfession=nResult[0].primary_profession?nResult[0].primary_profession.split(','):[]
         let known=nResult[0].known_for_titles?nResult[0].known_for_titles.split(','):[]
-        if(known.length>=0){
-            //obtengo los titulos por los que es conocido
-            let mainRoles=[]
-            //obengo la informacion de los roles 
-            for(let i=0;i<known.length;i++){
-                let role=await namePersistance.getRole(nconst,known[i])
-                mainRoles.push(role)
-            }
-            return new Name(nconst,nResult[0].primary_name,nResult[0].birth_year,nResult[0].death_year,primaryProfession,
-                known,mainRoles)
-        }else{
-            person.knownForTitles=null
-            return new Name(nconst,nResult[0].primary_name,nResult[0].birth_year,nResult[0].death_year,primaryProfession,
-                known)
-        }
+        
+        return new Name(nconst,nResult[0].primary_name,nResult[0].birth_year,
+            nResult[0].death_year,primaryProfession,known)
+        
     }else{
         //No se encontro la persona con el id
         return null
@@ -38,32 +27,27 @@ namePersistance.getNameFullData=async(nconst)=>{
 }
 
 
-namePersistance.getRole=async(nconst,tconst)=>{
-    let rResult=await pool.query('SELECT * FROM title_principals WHERE tconst=? AND nconst=?',[tconst,nconst])
-    if (rResult.length===1){
-        let characters=null
-        if(rResult[0].characters){
-            characters=rResult[0].characters.replaceAll('\"','')
-            characters=characters.replaceAll('[','')
-            characters=characters.replaceAll(']','')
-            characters=characters.split(',')
+namePersistance.getRoles=async(nconst)=>{
+    let rResults=await pool.query('SELECT * FROM title_principals WHERE nconst=?',[nconst])
+    if (rResults.length>0){
+        let roles=[]
+        for(let i=0;i<rResults.length;i++){
+            let characters=null
+            if(rResults[i].characters){
+                characters=rResults[0].characters.replaceAll('\"','')
+                characters=characters.replaceAll('[','')
+                characters=characters.replaceAll(']','')
+                characters=characters.split(',')
+            }
+            let role=new Role(rResults[i].tconst,nconst,rResults[i].category,rResults[i].job,characters)
+            roles.push(role)
         }
-        const role=new Role(nconst,await namePersistance.getName(nconst),tconst,await titlePersistance.getTitle(tconst),
-        rResult[0].category,rResult[0].job,characters)
-        return role
+        return roles
     }
     return null
 }
 
 
-namePersistance.getName=async(nconst)=>{
-    let nResult=await pool.query('SELECT primary_name FROM name_basics WHERE nconst=?',[nconst])
-    if(nResult.length===1){
-        return nResult[0].primary_name
-    }
-    //No encontro el nombre
-    return null
-}
 
 module.exports=namePersistance
 

@@ -8,7 +8,7 @@ const UserOpionion=require('../models/userOpinion')
 
 let titlePersistance={}
 
-
+/*
 titlePersistance.getTitleFullData=async(tconst,userId)=>{
     const tResult=await pool.query('SELECT * FROM title_basics WHERE tconst=?',[tconst])
     if(tResult.length>=1){
@@ -25,11 +25,14 @@ titlePersistance.getTitleFullData=async(tconst,userId)=>{
     }
     //No se encontro el titulo
     return null
-}
+}*/
 titlePersistance.getTitle=async(tconst)=>{
-    const tResult=await pool.query('SELECT primary_title FROM title_basics WHERE tconst=?',[tconst])
+    const tResult=await pool.query('SELECT * FROM title_basics WHERE tconst=?',[tconst])
     if(tResult.length===1){
-        return tResult[0].primary_title
+        
+        return new Title(tconst,tResult[0].primary_title,tResult[0].original_title,
+            tResult[0].title_type,tResult[0].runtime_minutes,tResult[0].start_year,
+            tResult[0].end_year,tResult[0].is_adult,tResult[0].genres?tResult[0].genres.split(','):null)
     }
     //No se encontro el titulo
     return null
@@ -65,8 +68,7 @@ titlePersistance.getPrincipals=async(tconst)=>{
                 characters=characters.replaceAll(']','')
                 characters=characters.split(',')
             }
-            let aux=new Role(pResults[i].nconst,await namePersistance.getName(pResults[i].nconst),tconst,
-            await titlePersistance.getTitle(tconst),pResults[i].category,pResults[i].job,characters)
+            let aux=new Role(tconst,pResults[i].nconst,pResults[i].category,pResults[i].job,characters)
             principals.push(aux)
         }
         return principals

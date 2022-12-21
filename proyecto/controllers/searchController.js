@@ -1,8 +1,12 @@
 const searchPersistance=require('../persistence/searchPersistance')
 let searchController={}
 
-const types=['short','movie','tvEpisode','tvSeries','tvShort','tvMovie','tvMiniSerie','tvSpecial','video','tvPilot']
-const genres=['Action','Adult','Adventure','Animation','Biography','Comedy','Crime','Documentary','Drama','Family','Fantasy','Film Noir','Game show','History','Horror','Musical','Music','Mystery','News','Reality-TV','Romance','Sci-Fi','Short','Sport','Talk-Show','Thriller','War','Western']
+const types=['short','movie','tvEpisode','tvSeries','tvShort',
+'tvMovie','tvMiniSerie','tvSpecial','video','tvPilot']
+const genres=['Action','Adult','Adventure','Animation','Biography',
+'Comedy','Crime','Documentary','Drama','Family','Fantasy','Film Noir',
+'Game show','History','Horror','Musical','Music','Mystery','News','Reality-TV',
+'Romance','Sci-Fi','Short','Sport','Talk-Show','Thriller','War','Western']
 
 
 searchController.listTitles=async(req,res,next)=>{
@@ -22,12 +26,27 @@ searchController.listTitles=async(req,res,next)=>{
         type=null
     }
     locals.path=req.path
-    locals.titles=await searchPersistance.listTitles(limit,offset,type,userId)
-    locals.limit=limit
-    locals.offset=offset
-    locals.type=type
-    locals.navigation=getNavigation(limit,offset,locals.path,req.query)
-    res.json(locals)
+    try{
+        locals.results=[]
+        let results=await searchPersistance.listTitles(limit,offset,type,userId)
+        if(results!==null){
+            for(let i=0;i<results.length;i++){
+                let result={}
+                result.title=results[i]
+                result.link=`${req.protocol}://${req.get('host')}/title/${results[i].tconst}`
+                locals.results.push(result)
+            }
+        }else{
+            locals.results={msg:'No results'}
+        }
+        locals.limit=limit
+        locals.offset=offset
+        locals.type=type
+        locals.navigation=getNavigation(limit,offset,locals.path,req.query,locals.results.length)
+        res.json(locals)
+    }catch{
+        res.status(500).json({error:error.message})
+    }
 }
 
 searchController.search=async(req,res,next)=>{
@@ -37,10 +56,26 @@ searchController.search=async(req,res,next)=>{
     let locals={}
     let userId=req.session.loggedin?req.session.user.idUser:null
     locals.path=req.path
-    locals.titles=await searchPersistance.search(search,limit,offset,userId)
-    locals.navigation=getNavigation(limit,offset,locals.path,req.query)
-    //res.json(locals)
-    res.json(locals)
+
+    try{
+        const results=await searchPersistance.search(search,limit,offset,userId)
+        locals.results=[]
+        if(results!==null){
+            for(let i=0;i<results.length;i++){
+                let result={}
+                result.title=results[i]
+                result.link=`${req.protocol}://${req.get('host')}/title/${results[i].tconst}`
+                locals.results.push(result)
+            }
+        }else{
+            locals.results={msg:'No results'}
+        }
+        
+        locals.navigation=getNavigation(limit,offset,locals.path,req.query,locals.results.length)
+        res.json(locals)
+    }catch{
+        res.status(500).json({error:error.message})
+    }
 }
 
 searchController.advanceSearch=async(req,res,next)=>{
@@ -50,54 +85,75 @@ searchController.advanceSearch=async(req,res,next)=>{
     let locals={}
     let userId=req.session.loggedin?req.session.user.idUser:null
     locals.path=req.path
-    //controllo la cantidad de queryparams
-    let len=Object.keys(req.query).length
-    if(len===0){
-        locals.searchFlag=false
+    try{
+        //controllo la cantidad de queryparams
+        let len=Object.keys(req.query).length
+        if(len===0){
+            locals.searchFlag=false
+            res.json(locals)
+        }else{
+            locals.searchFlag=true
+        }
+        locals.genres=[]
+        locals.types=[]
+        locals.search=search
+        //Tomo las claves y valores de query
+        let keys=Object.keys(req.query)
+        let values=Object.values(req.query)
+        //Checkeo uno a uno si pertenece a la lista de generos o type y si el valor es on(value del checkbox)
+        for(let i=0;i<len;i++){
+            if(genres.includes(keys[i])&&values[i]=='on'){
+                locals.genres.push(keys[i])
+            }
+            if(types.includes(keys[i])&&values[i]=='on'){
+                locals.types.push(keys[i])
+            }
+        }
+        locals.startYear=req.query.startyear
+        locals.search=req.query.search
+        locals.duration=req.query.duration
+        locals.rating=req.query.rating
+        locals.offset=offset
+        locals.limit=limit
+        const results=await searchPersistance.advanceSearch(locals.search,limit,offset,locals.types,locals.genres,
+            locals.startYear,locals.rating,locals.duration,userId)
+        locals.results=[]
+        if(results!==null){
+            for(let i=0;i<results.length;i++){
+                let result={}
+                result.title=results[i]
+                result.link=`${req.protocol}://${req.get('host')}/title/${results[i].tconst}`
+                locals.results.push(result)
+            } 
+        }else{
+            locals.results={msg:'No results'}
+        }
+        
+        locals.navigation=getNavigation(limit,offset,locals.path,req.query,locals.results.length)
+        
         res.json(locals)
-    }else{
-        locals.searchFlag=true
+    }catch{
+        res.status(500).json({error:error.message})
     }
-    locals.genres=[]
-    locals.types=[]
-    locals.search=search
-    //Tomo las claves y valores de query
-    let keys=Object.keys(req.query)
-    let values=Object.values(req.query)
-    //Checkeo uno a uno si pertenece a la lista de generos o type y si el valor es on(value del checkbox)
-    for(let i=0;i<len;i++){
-        if(genres.includes(keys[i])&&values[i]=='on'){
-            locals.genres.push(keys[i])
-        }
-        if(types.includes(keys[i])&&values[i]=='on'){
-            locals.types.push(keys[i])
-        }
-    }
-    locals.startYear=req.query.startyear
-    locals.search=req.query.search
-    locals.duration=req.query.duration
-    locals.rating=req.query.rating
-    locals.offset=offset
-    locals.limit=limit
-    locals.titles=await searchPersistance.advanceSearch(locals.search,limit,offset,locals.types,locals.genres,
-        locals.startYear,locals.rating,locals.duration,userId)
-    locals.navigation=getNavigation(limit,offset,locals.path,req.query)
-    
-    res.json(locals)
-    //res.render('advanceSearch',locals)
 }
 
-const getNavigation=(limit,offset,path,query)=>{
+const getNavigation=(limit,offset,path,query,cant)=>{
     //Obtengo las urls para la navegacion
     let navigation={}
     let nextUrl=new URLSearchParams(query)
     let aux=offset+limit
-    nextUrl.set('offset',aux)
-    navigation.nextUrl=path+'?'+nextUrl.toString()
+    if(cant==limit){
+        nextUrl.set('offset',aux)
+        navigation.nextUrl=path+'?'+nextUrl.toString()
+    }
+    
     let prevUrl=new URLSearchParams(query)
     aux=offset-limit
-    prevUrl.set('offset',aux)
+    if(aux>=0){
+        prevUrl.set('offset',aux)
     navigation.prevUrl=path+'?'+prevUrl.toString(query)
+    }
+    
     //Limits posibles [25,50,100]
     let limit25=new URLSearchParams(query)
     limit25.set('offset',0)
