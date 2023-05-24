@@ -15,7 +15,7 @@ Una vez armada la base de datos para correrlo de forma local solo es necesario c
 
 ```sh
 # Desde la carpeta ./proyecto
-mpn start
+npm start
 ```
 
 ## Estructura del proyecto
